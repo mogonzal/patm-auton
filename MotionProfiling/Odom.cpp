@@ -81,7 +81,8 @@ void Odom::startRotate(double alpha) {
         sumAlpha = 0;
         alphaStopCount = 0;
         resetEncoders();
-        rotating = false;
+        rotating = true;
+        Serial.println("STARTED ROTATE");
     }
 }
 
@@ -90,12 +91,13 @@ void Odom::continueRotate() {
         // main calculations
         double alpha = alphaTraveled();
         double error = targetAlpha - alphaTraveled();
-        double res = kPr * error + kIr * sumAlpha - kDt * (alpha - prevAlpha);
+        Serial.print("alpha: "); Serial.println(alpha);
+        double res = kPr * error + kIr * sumAlpha - kDr * (alpha - prevAlpha);
 
-        // account for non-straightness
-        double diff = diffTraveled();
-        *outL = limit(res + kPs * diff);
-        *outR = limit(res - kPs * diff);
+        //Serial.print("res: "); Serial.println(res);
+
+        *outL = limit(-res);
+        *outR = limit(res);
 
         // check for stopping
         if (fabs(error) <= alphaTol) {
@@ -152,6 +154,14 @@ bool Odom::isTranslating() {
     return translating;
 }
 
+void Odom::setTranslating(bool _translating) {
+    translating = _translating;
+}
+
 bool Odom::isRotating() {
     return rotating;
+}
+
+void Odom::setRotating(bool _rotating) {
+    rotating = _rotating;
 }

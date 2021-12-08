@@ -17,7 +17,9 @@ class Odom {
         void loop();
 
         bool isTranslating();
+        void setTranslating();
         bool isRotating();
+        void setRotating();
 
 
     private:
@@ -30,7 +32,7 @@ class Odom {
 
         unsigned long sampleTime = 20; //ms
         double alphaTol = 0.05;
-        double distTol = 0.5;
+        double distTol = 1.0;
         unsigned long countTol = 20;
         double radius; //mm
         double length; //mm
