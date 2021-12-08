@@ -17,9 +17,9 @@ class Odom {
         void loop();
 
         bool isTranslating();
-        void setTranslating();
+        void setTranslating(bool _translating);
         bool isRotating();
-        void setRotating();
+        void setRotating(bool _rotating);
 
 
     private:
