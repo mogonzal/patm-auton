@@ -104,8 +104,8 @@ void loop() {
 
   if (state == 0) {
     state = 1;
-    odom.startTranslate(500.0); // move 500mm forward
-    //odom.startRotate(PI/2 * 2.25);
+    //odom.startTranslate(500.0); // move 500mm forward
+    odom.startRotate(PI/2 * 2.25, true);
     //motorL = 7.0;
     //motorR = 7.0;
   }

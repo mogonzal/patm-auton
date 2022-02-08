@@ -12,7 +12,7 @@ class Odom {
         void configureRotationPID(double kP, double kI, double kD);
 
         void startTranslate(double dist);
-        void startRotate(double alpha);
+        void startRotate(double alpha, bool _useLeft);
 
         void loop();
 
@@ -41,6 +41,7 @@ class Odom {
         bool translating = false;
         bool rotating = false;
 
+        bool useLeft;
         double targetAlpha; //rad
         double prevAlpha; //rad
         double sumAlpha;

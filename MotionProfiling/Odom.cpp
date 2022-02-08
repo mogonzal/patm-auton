@@ -74,8 +74,11 @@ void Odom::continueTranslate() {
     }
 }
 
-void Odom::startRotate(double alpha) {
+void Odom::startConstantRotate(double alpha, )
+
+void Odom::startRotate(double alpha, bool _useLeft) {
     if (!translating) {
+        useLeft = _useLeft;
         targetAlpha = alpha;
         prevAlpha = 0;
         sumAlpha = 0;
@@ -95,9 +98,9 @@ void Odom::continueRotate() {
         double res = kPr * error + kIr * sumAlpha - kDr * (alpha - prevAlpha);
 
         //Serial.print("res: "); Serial.println(res);
-
-        *outL = limit(-res);
-        *outR = limit(res);
+    
+        *outL = useLeft ? limit(-res) : 0.0;
+        *outR = useLeft ? 0.0 : limit(res);
 
         // check for stopping
         if (fabs(error) <= alphaTol) {
