@@ -55,7 +55,109 @@ PreMo::PreMo(float radius, float length, double kp, double kd, float kpMotor, fl
 	// Initizlie PurePursuit
 	_purePursuit = new PurePursuit((*_deadReckoner).getXPointer(),
 					(*_deadReckoner).getYPointer(), (*_deadReckoner).getHeadingPointer(), length);
+
+	_isTranslating = false;
+	_isRotating = false;
+	_translateDistance = 0.0;
+	_rotateAngle = 0.0;
 }
+
+void PreMo::startTranslate(float distance) // forward +, backward -
+{
+	// Reset gyro and encoders
+	(*_deadReckoner).reset();
+
+	// Set target distance
+	_translateDistance = distance;
+
+	// Start movement
+	_isRotating = false;
+	_isTranslating = true;
+}
+
+void PreMo::startRotate(float angle) // ccw +, cw -
+{
+	// Reset gyro and encoders
+	(*_deadReckoner).reset();
+
+	// Set target angle
+	_rotateAngle = angle;
+
+	// Start movement
+	_isTranslating = true;
+	_isRotating = false;
+}
+
+void PreMo::continueTranslating()
+{
+	Serial.println("i am getting here");
+	DeadReckoner& dr = *_deadReckoner;
+	MotorManager& mm = *_motorManager;
+
+	double heading = dr.getHeading()*RAD_TO_DEG;
+	double error = _translateDistance - dr.getX();
+
+	int resL = (int) (0.1 * heading);
+	int resR = (int) (-0.1 * heading);
+
+	if (error > _TRANSLATE_THRESHOLD_DIST) {
+
+		resL += _motorSpeed;
+		resR += _motorSpeed;
+
+	}
+	else if (error < -1 * _TRANSLATE_THRESHOLD_DIST) {
+		
+		resL -= _motorSpeed;
+		resR -= _motorSpeed;
+	}
+	else {
+		_isTranslating = false;
+		mm.stop();
+		return;
+	}
+
+	if (resL >= 0) {
+		mm.leftForward(resL);
+	}
+	else {
+		mm.leftReverse(-1 * resL);
+	}
+
+	if (resR >= 0) {
+		mm.rightForward(resR);
+	}
+	else {
+		mm.rightReverse(-1 * resR);
+	}
+}
+
+void PreMo::continueRotating()
+{
+	DeadReckoner& dr = *_deadReckoner;
+	MotorManager& mm = *_motorManager;
+
+	double heading = dr.getHeading()*RAD_TO_DEG;
+	double error = _rotateAngle - heading;
+
+	if (error > _TWIST_THRESHOLD_ANGLE) { //needs to rotate CCW
+		
+		mm.leftReverse(_twistSpeed);
+		mm.rightForward(_twistSpeed);
+
+	}
+	else if (error < -1 * _TWIST_THRESHOLD_ANGLE) { //CW
+
+		mm.leftForward(_twistSpeed);
+		mm.rightReverse(_twistSpeed);
+
+	}
+	else {
+		_isRotating = false;
+		mm.stop();
+	}
+}
+
 
 void PreMo::goToDelta(float deltaX, float deltaY)
 {
@@ -261,7 +363,7 @@ void PreMo::continueTwist()
 			dr.setRightDirection(WHEEL_REVERSE);
 		}
 		else {
-			_isTwisting = false;
+			_isRotating = false;
 			stop();
 		}
 	}
@@ -489,13 +591,20 @@ void PreMo::loop()
 	// Dead reckoning
 	(*_deadReckoner).computePosition();
 
-	if (_isFollowingPath)
-	{
-		continuePathFollowing();
+	// if (_isFollowingPath)
+	// {
+	// 	continuePathFollowing();
+	// }
+	// else if (_isTwisting)
+	// {
+	// 	continueTwist();
+	// }
+
+	if (_isTranslating) {
+		continueTranslating();
 	}
-	else if (_isTwisting)
-	{
-		continueTwist();
+	else if (_isRotating) {
+		continueRotating();
 	}
 }
 

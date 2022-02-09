@@ -141,8 +141,11 @@ void DeadReckoner::computeAngularVelocities() {
 	double changeLeftTicks = getEncoderChange(*leftTicks, leftTicksPrev);
 	double changeRightTicks = getEncoderChange(*rightTicks, rightTicksPrev);
 
-	wl = leftOmegaDirection * changeLeftTicks / dt_omega * toRadPerSec;
-	wr = rightOmegaDirection * changeRightTicks / dt_omega * toRadPerSec;
+	// wl = leftOmegaDirection * changeLeftTicks / dt_omega * toRadPerSec;
+	// wr = rightOmegaDirection * changeRightTicks / dt_omega * toRadPerSec;
+
+	wl = changeLeftTicks / dt_omega * toRadPerSec;
+	wr = changeRightTicks / dt_omega * toRadPerSec;
 
 	//long lt = (*leftTicks);
 	//long rt = (*rightTicks);

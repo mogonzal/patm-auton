@@ -58,6 +58,11 @@ public:
 	void printPath();
 	void reset();
 
+	void startTranslate(float distance);
+	void startRotate(float angle);
+	void continueTranslating();
+	void continueRotating();
+
 private:
 	static void transformCoordinate(float* x, float* y, float translateAngle, float translateX, float translateY);
 	void moveMotors(int motorSpeed, double diff);
@@ -91,7 +96,13 @@ private:
 	long _passTime;
 	float _targetHeading;
 	bool _twistBothMotors;
-	static constexpr float _TWIST_THRESHOLD_ANGLE = 2;
+	static constexpr float _TWIST_THRESHOLD_ANGLE = 2; //deg
+	static constexpr float _TRANSLATE_THRESHOLD_DIST = 5; //mm
+
+	bool _isTranslating;
+	bool _isRotating;
+	float _translateDistance;
+	float _rotateAngle;
 
 	// PID
 	PID* _pid;
